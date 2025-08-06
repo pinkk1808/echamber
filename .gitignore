@@ -1,0 +1,13 @@
+# Ignored files for a Laravel project
+/node_modules
+/public/storage
+/vendor
+/.env
+/.env.backup
+/storage/*.key
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/cache/data/*
+/storage/logs/*.log
+npm-debug.log
+yarn-error.log
