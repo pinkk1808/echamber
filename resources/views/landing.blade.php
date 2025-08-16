@@ -11,51 +11,59 @@
 
         <!-- Scripts and Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        {{-- Custom styles to ensure the background behaves correctly --}}
+        <style>
+            body {
+                background-image: url('{{ asset('images/hero-bg.jpg') }}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }
+        </style>
     </head>
-    {{-- We use a light gray background for a calming, professional feel --}}
-    <body class="antialiased bg-gray-100">
-        <div class="relative min-h-screen flex flex-col items-center justify-center">
-
-            {{-- This is the main white card in the center --}}
-            <div class="w-full max-w-xl p-8 bg-white rounded-lg shadow-lg text-center">
+    <body class="antialiased">
+        <div class="relative min-h-screen flex items-center justify-center bg-black bg-opacity-50">
+            
+            {{-- Main content card --}}
+            <div class="w-full max-w-2xl p-8 text-center">
                 
-                {{-- Your Application Logo --}}
-                <div>
-                    <a href="/">
-                        <x-application-logo class="w-20 h-20 fill-current text-gray-500 inline-block" />
-                    </a>
+                {{-- Logo --}}
+                <div class="flex justify-center mb-4">
+                    {{-- THIS FIXES THE LOGO SIZE --}}
+                    <x-application-logo class="w-16 h-16 fill-current text-white" />
                 </div>
                 
                 {{-- Main Headline --}}
-                <h1 class="mt-6 text-4xl font-bold text-gray-800">
-                    Welcome to eChamber
+                <h1 class="text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">
+                    eChamber
                 </h1>
 
                 {{-- Tagline --}}
-                <p class="mt-4 text-lg text-gray-600">
+                <p class="mt-4 text-xl text-gray-200 drop-shadow-md">
                     Quality healthcare, right from the comfort of your home.
                 </p>
 
-                {{-- This container holds the Login and Register buttons --}}
-                <div class="mt-8 flex items-center justify-center gap-x-6">
+                {{-- Container for the action buttons --}}
+                <div class="mt-10 flex items-center justify-center gap-x-6">
                     
-                    {{-- Register Button (Primary) --}}
-                    <a href="{{ route('register') }}" class="rounded-md bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        Get started
+                    {{-- Register Button (Primary Action) - NOW BIGGER --}}
+                    <a href="{{ route('register') }}" class="rounded-md bg-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition">
+                        Get Started
                     </a>
 
-                    {{-- Login Button (Secondary) --}}
-                    <a href="{{ route('login') }}" class="text-sm font-semibold leading-6 text-gray-900">
-                        Log in <span aria-hidden="true">→</span>
+                    {{-- Login Button (Secondary Action) - NOW BIGGER --}}
+                    <a href="{{ route('login') }}" class="text-lg font-semibold leading-6 text-white hover:text-gray-300 transition">
+                        Log In <span aria-hidden="true">→</span>
                     </a>
 
                 </div>
             </div>
 
-            <footer class="mt-8 text-center text-sm text-gray-500">
-                eChamber © {{ date('Y') }}. All rights reserved.
+            <footer class="absolute bottom-4 text-center text-sm text-gray-300">
+                eChamber &copy; {{ date('Y') }}. All rights reserved.
             </footer>
         </div>
     </body>
 </html>
-```6.  Save the `landing.blade.php` file.

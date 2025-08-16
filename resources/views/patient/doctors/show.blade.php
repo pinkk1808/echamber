@@ -21,34 +21,46 @@
                         @endif
                         <h3 class="text-2xl font-bold mt-4">{{ $doctor->name }}</h3>
                         <p class="text-md text-indigo-600 font-semibold">{{ $doctor->doctorProfile->specialization ?? 'No Specialization' }}</p>
-                        <p class="text-sm text-gray-500">{{ $doctor->doctorProfile->qualifications ?? '' }}</p>
+                        
+                        {{-- NEW: Display Average Rating --}}
+                        @if($doctor->doctorReviews->isNotEmpty())
+                            <div class="mt-2 flex items-center">
+                                <div class="flex text-yellow-400">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= round($doctor->average_rating))
+                                            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        @else
+                                            <svg class="w-5 h-5 fill-current text-gray-300" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">({{ number_format($doctor->average_rating, 1) }}/5.0 based on {{ $doctor->doctorReviews->count() }} reviews)</span>
+                            </div>
+                        @endif
+
                         <p class="mt-4 text-sm text-gray-600">{{ $doctor->doctorProfile->bio ?? 'No biography available.' }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Availability & Booking -->
+            <!-- Right Column: Availability, Booking, and Reviews -->
             <div class="md:col-span-2 space-y-6">
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                     <h3 class="text-lg font-medium text-gray-900">Weekly Availability</h3>
                     <div class="mt-4 space-y-2">
-                        @if($availabilities->isNotEmpty())
-                            @foreach($availabilities as $item)
-                                <div class="p-3 border rounded-md bg-gray-50">
-                                    <strong>{{ $item->day_of_week }}:</strong> 
-                                    <span class="font-mono text-green-700">{{ \Carbon\Carbon::parse($item->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($item->end_time)->format('h:i A') }}</span>
-                                </div>
-                            @endforeach
-                        @else
+                        @forelse($availabilities as $item)
+                            <div class="p-3 border rounded-md bg-gray-50">
+                                <strong>{{ $item->day_of_week }}:</strong> 
+                                <span class="font-mono text-green-700">{{ \Carbon\Carbon::parse($item->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($item->end_time)->format('h:i A') }}</span>
+                            </div>
+                        @empty
                             <p class="text-gray-600">This doctor has not set their schedule yet.</p>
-                        @endif
+                        @endforelse
                     </div>
                     
-                    {{-- This is the new Appointment Booking Form --}}
                     <div class="mt-8 border-t pt-6">
                         <h3 class="text-lg font-medium text-gray-900">Book an Appointment</h3>
                         
-                        {{-- Display Success or Error Messages after form submission --}}
                         @if(session('success'))
                             <div class="mt-2 text-sm text-green-600 bg-green-100 p-3 rounded-md">{{ session('success') }}</div>
                         @endif
@@ -58,38 +70,49 @@
 
                         <form method="POST" action="{{ route('appointments.store') }}" class="mt-4 space-y-4">
                             @csrf
-                            
-                            {{-- This hidden field sends the doctor's ID with the form --}}
                             <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
-
-                            <!-- Appointment Date -->
                             <div>
                                 <x-input-label for="appointment_date" :value="__('Date')" />
                                 <x-text-input id="appointment_date" name="appointment_date" type="date" class="mt-1 block w-full" :min="now()->toDateString()" required />
-                                <x-input-error :messages="$errors->get('appointment_date')" class="mt-2" />
                             </div>
-
-                            <!-- Appointment Time -->
                             <div>
                                 <x-input-label for="appointment_time" :value="__('Time')" />
                                 <x-text-input id="appointment_time" name="appointment_time" type="time" class="mt-1 block w-full" required />
-                                <x-input-error :messages="$errors->get('appointment_time')" class="mt-2" />
                             </div>
-
-                            <!-- Optional Notes -->
                             <div>
                                 <x-input-label for="notes" :value="__('Reason for visit (optional)')" />
                                 <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('notes') }}</textarea>
                             </div>
-
                             <div>
-                                <x-primary-button>
-                                    {{ __('Request Appointment') }}
-                                </x-primary-button>
+                                <x-primary-button>{{ __('Request Appointment') }}</x-primary-button>
                             </div>
                         </form>
                     </div>
+                </div>
 
+                {{-- NEW: Patient Feedback Section --}}
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <h3 class="text-lg font-medium text-gray-900">Patient Feedback</h3>
+                    <div class="mt-4 space-y-4">
+                        @forelse($doctor->doctorReviews as $review)
+                            <div class="border-t pt-4">
+                                <div class="flex justify-between items-center">
+                                    <p class="font-semibold">{{ $review->patient->name }}</p>
+                                    <div class="flex text-yellow-400">
+                                        @for ($i = 0; $i < $review->rating; $i++)
+                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        @endfor
+                                        @for ($i = $review->rating; $i < 5; $i++)
+                                            <svg class="w-4 h-4 fill-current text-gray-300" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        @endfor
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1 italic">"{{ $review->comment ?? 'No comment left.' }}"</p>
+                            </div>
+                        @empty
+                            <p class="text-gray-600">This doctor has not received any reviews yet.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 

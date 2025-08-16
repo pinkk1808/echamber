@@ -33,4 +33,12 @@ class Appointment extends Model
     {
         return $this->belongsTo(User::class, 'patient_id');
     }
+    public function prescription()
+    {
+        return $this->hasOne(Prescription::class);
+    }
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }

@@ -75,4 +75,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
+    public function doctorReviews()
+    {
+        return $this->hasMany(Review::class, 'doctor_id');
+    }
+    public function patientReviews()
+    {
+        return $this->hasMany(Review::class, 'patient_id');
+
+    }
+    public function getAverageRatingAttribute()
+    {
+    // We use the 'doctorReviews' relationship we defined earlier
+    // and get the average of the 'rating' column.
+        return $this->doctorReviews()->avg('rating');
+    }
 }
+

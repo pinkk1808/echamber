@@ -30,7 +30,7 @@ class DoctorController extends Controller
         }
 
         // Load the necessary related data.
-        $doctor->load('doctorProfile', 'availabilities');
+        $doctor->load('doctorProfile', 'availabilities', 'doctorReviews.patient');
 
         // Sort the availability for display.
         $sortedAvailabilities = $doctor->availabilities->sortBy(function($model) {
